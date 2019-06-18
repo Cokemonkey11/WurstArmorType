@@ -1,0 +1,6 @@
+---
+projectName: WurstArmorType
+buildMapData:
+  name: MyMapName
+  fileName: MyMapFile
+  author: Blake
