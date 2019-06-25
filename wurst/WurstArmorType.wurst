@@ -8,7 +8,7 @@ package WurstArmorType
 
 /**
 	A type-safe wrapper for unit armor type.  Typically this should be obtained
-	by evaluating a unit's getArmorType() extension-function.
+	by evaluating a unit's `getArmorType()` extension-function.
 */
 public enum ArmorType
 	UNKNOWN
