@@ -1,0 +1,16 @@
+---
+- Package:
+    doc: "This package is for evaluating the armor type (light, medium, heavy) of a\n\tunit.  It is a thin wrapper around\n\t`BlzGetUnitIntegerField(u, UNIT_IF_DEFENSE_TYPE)`.  The API is exposed as an\n\tenum, and the enum values can be printed with the .display() method."
+    name: WurstArmorType
+    classes: []
+    free_fns:
+      - doc: "Cast an armor type variant to string, using the default game-friendly names,\n\ti.e. \"None\" becomes \"Unarmored\", \"Large\" becomes \"Heavy\", etc."
+        extensor: ArmorType
+        name: display
+        params: []
+        returns: string
+      - doc: "Get the armor type from a given unit.  Uses 1.31 natives for the unit's\n\tobject field, via UNIT_IF_DEFENSE_TYPE."
+        extensor: unit
+        name: getArmorType
+        params: []
+        returns: ArmorType

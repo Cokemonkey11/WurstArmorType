@@ -1,0 +1,120 @@
+<!doctype html>
+<html>
+<head>
+    <title>WurstArmorType Docs</title>
+
+    <link
+        rel="stylesheet"
+        href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
+        integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf"
+        crossorigin="anonymous"
+    />
+
+    <style type="text/css">
+        .contents {
+            max-width: 50em;
+            margin: 0.5em auto;
+        }
+        .packname {
+            cursor: pointer;
+        }
+        .packcontainer {
+            margin: 1em;
+            padding: 0.5em 1em;
+            background-color: #eee;
+            border-radius: 0.5em;
+        }
+        .status-coal > h2 {
+            color: #666;
+        }
+        .status-bronze {
+            box-shadow: 0px 1px 2px -1px #444;
+        }
+        .status-bronze > h2 {
+            color: #444;
+        }
+        .status-silver {
+            box-shadow: 0px 2px 3px -1px #222;
+        }
+        .status-silver > h2 {
+            color: #222;
+        }
+        .path {
+            font-family: monospace;
+        }
+        .fnname {
+            font-family: monospace;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="loading">
+        Loading...
+    </div>
+    <div class="contents">
+
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/3.13.0/js-yaml.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(() => {
+            $('.contents').append(`<h1>Wurstdoktor</h1>`);
+            $('.contents').append(`<button type="button" class="unfold">Unfold all</button>`);
+            $('.unfold').click(() => {
+                $('.package').slideDown();
+            });
+
+            [
+                ["./wurstdoktor.yaml", "gold"],
+            ].forEach(([uri, status]) => {
+                $.get(uri, (data) => {
+                    $('.loading').hide();
+
+                    jsyaml.load(data).forEach((package) => {
+                        Object.entries(package).forEach(([package, details]) => {
+                            // Package name and doc.
+                            $('.contents').append(`<div class="packcontainer ctr-${details.name} status-${status}"></div>`);
+
+                            $(`.ctr-${details.name}`).append(`<h2 class="packname hdr-${details.name}"> <i class="fas fa-archive"></i> ${details.name}</h2>`);
+                            $(`.ctr-${details.name}`).append(`<div class="package pkg-${details.name}"></div>`);
+
+                            $(`.pkg-${details.name}`).append(`<p class="path"><i class="fas fa-folder-open"></i> ${uri}</p>`);
+                            details.doc !== null ? $(`.pkg-${details.name}`).append(
+                                `${details.doc.split("\n\n").map((line) => "<p>" + line + "</p>").join('')}`
+                            ) : null;
+
+                            $(`.pkg-${details.name}`).hide();
+                            $(`.hdr-${details.name}`).click(() => {
+                                $(`.pkg-${details.name}`).toggle();
+                            })
+
+                            details.classes.forEach((cls) => {
+                                const icon = `<i class="fas fa-object-group"></i>`;
+                                $(`.pkg-${details.name}`).append(`<h3>${icon} ${cls.name}</h3>`);
+                                $(`.pkg-${details.name}`).append(`<p>${cls.doc}</p>`);
+
+                                cls.fns.forEach((fn) => {
+                                    const icon = `<i class="fas fa-square-root-alt"></i>`;
+                                    $(`.pkg-${details.name}`).append(`<h4>${icon} ${fn.extensor !== null ? fn.extensor + "." : ""}${fn.name}()</h4>`);
+                                    // TODO: params
+                                    $(`.pkg-${details.name}`).append(`<p>${fn.doc}</p>`);
+                                });
+                            });
+
+                            details.free_fns.forEach((fn) => {
+                                const icon = `<i class="fas fa-square-root-alt"></i>`;
+                                $(`.pkg-${details.name}`).append(`<h3 class="fnname">${icon} ${fn.extensor !== null ? fn.extensor + "." : ""}${fn.name}()</h3>`);
+                                // TODO: params
+                                fn.doc !== null ? $(`.pkg-${details.name}`).append(`<p>${fn.doc}</p>`) : null;
+                            });
+                        })
+                    });
+                }).fail((e) => {
+                    console.error(`halt ${JSON.stringify(e.status)}`);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
